@@ -10,9 +10,9 @@ public class TeleOP26 extends LinearOpMode {
     private boolean catapultRunning = false;
     private boolean lastCatapultButton = false;
 
-    private static final int CATAPULT_TICKS = 28;
-    private static final double CATAPULT_POWER = 0.15;
-    public SubSystem26 subsystem26 =  new SubSystem26();
+    private static final int CATAPULT_TICKS = 250;
+    private static final double CATAPULT_POWER = 0.85;
+    public SubSystem26 subsystem26 = new SubSystem26();
     private double motorSpeed = 1;
 
     // Intake variables
@@ -49,11 +49,12 @@ public class TeleOP26 extends LinearOpMode {
             telemetry.update();
         }
     }
+
     private void driveMecanum() {
         double drive = gamepad1.left_stick_y;
         double strafe = gamepad1.left_stick_x;
         double rotate = gamepad1.right_stick_x;
-        subsystem26.drivetrain.driveMecanum(motorSpeed,drive,strafe,rotate);
+        subsystem26.drivetrain.driveMecanum(motorSpeed, drive, strafe, rotate);
     }
 
     // Drive speed control
@@ -95,24 +96,19 @@ public class TeleOP26 extends LinearOpMode {
     // Shooter control (67% manual response)
 
     private void adjustCarousel() {
-        subsystem26.intake.carouselMotor.setPower(
-                gamepad2.left_bumper ? 0.5 : 0.0);
+        subsystem26.intake.carouselMotor.setPower(gamepad2.a ? 0.2 : 0.0);
     }
 
     private void runAutomaticCatapult() {
-        boolean button = gamepad2.right_bumper;
-    
+        boolean button = gamepad2.b;
+
         if (button && !lastCatapultButton && !catapultRunning) {
-            private void adjustCarousel;() {
-                subsystem26.intake.carouselMotor.setPower(
-                        gamepad2.left_bumper ? 0.5 : 0.0);
-            }
+            
+            int current = subsystem26.shooter.catapultMotor.getCurrentPosition();
 
-            subsystem26.shooter.catapultMotor.setTargetPosition(
-                    current + CATAPULT_TICKS);
+            subsystem26.shooter.catapultMotor.setTargetPosition(current + CATAPULT_TICKS);
 
-            subsystem26.shooter.catapultMotor.setMode(
-                    DcMotor.RunMode.RUN_TO_POSITION);
+            subsystem26.shooter.catapultMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             subsystem26.shooter.catapultMotor.setPower(CATAPULT_POWER);
             catapultRunning = true;
@@ -120,13 +116,14 @@ public class TeleOP26 extends LinearOpMode {
 
         lastCatapultButton = button;
 
-        if (catapultRunning &&
-                !subsystem26.shooter.catapultMotor.isBusy()) {
+        if (catapultRunning && !subsystem26.shooter.catapultMotor.isBusy()) {
 
-            subsystem26.shooter.catapultMotor.setPower(0);
+            int current = subsystem26.shooter.catapultMotor.getCurrentPosition();
+            subsystem26.shooter.catapultMotor.setPower(-CATAPULT_POWER);
 
-            subsystem26.shooter.catapultMotor.setMode(
-                    DcMotor.RunMode.RUN_USING_ENCODER);
+            subsystem26.shooter.catapultMotor.setTargetPosition(current - CATAPULT_TICKS);
+
+            subsystem26.shooter.catapultMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             catapultRunning = false;
         }
