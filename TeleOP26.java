@@ -103,7 +103,7 @@ public class TeleOP26 extends LinearOpMode {
         boolean button = gamepad2.b;
 
         if (button && !lastCatapultButton && !catapultRunning) {
-            
+
             int current = subsystem26.shooter.catapultMotor.getCurrentPosition();
 
             subsystem26.shooter.catapultMotor.setTargetPosition(current + CATAPULT_TICKS);
@@ -122,6 +122,8 @@ public class TeleOP26 extends LinearOpMode {
             subsystem26.shooter.catapultMotor.setPower(-CATAPULT_POWER);
 
             subsystem26.shooter.catapultMotor.setTargetPosition(current - CATAPULT_TICKS);
+
+            subsystem26.shooter.catapultMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             subsystem26.shooter.catapultMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
